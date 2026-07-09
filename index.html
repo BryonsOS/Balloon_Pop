@@ -9,7 +9,8 @@
     body{
       font-family:'Segoe UI',Helvetica,Arial,sans-serif;
       background:linear-gradient(160deg,#74b9ff 0%,#a8d8ea 50%,#b8f4c8 100%);
-      height:100vh;overflow:hidden;
+      height:100vh;height:100dvh;
+      overflow:hidden;
       display:flex;align-items:center;justify-content:center;
       user-select:none;-webkit-user-select:none;
       -webkit-tap-highlight-color:transparent;
@@ -20,7 +21,9 @@
       position:fixed;inset:0;z-index:20;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
       padding:20px;
+      height:100vh;height:100dvh;
       background:linear-gradient(160deg,#74b9ff 0%,#a8d8ea 50%,#b8f4c8 100%);
+      overflow-y:auto;
     }
     .screen.hidden{display:none;}
 
@@ -44,17 +47,16 @@
       color:#fff;font-size:17px;font-weight:800;cursor:pointer;letter-spacing:.3px;
       box-shadow:0 4px 16px rgba(238,90,36,0.4);
       transition:transform .12s,box-shadow .12s,opacity .12s;
-      position:relative;overflow:hidden;
     }
     .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(238,90,36,0.45);}
     .btn:active{transform:translateY(1px);box-shadow:0 2px 8px rgba(238,90,36,0.3);}
+    .btn:disabled{opacity:.55;cursor:default;transform:none;}
     .btn.secondary{background:linear-gradient(135deg,#6c5ce7,#a29bfe);box-shadow:0 4px 16px rgba(108,92,231,0.4);}
     .btn.secondary:hover{box-shadow:0 6px 20px rgba(108,92,231,0.45);}
+    .btn.gold{background:linear-gradient(135deg,#fdcb6e,#e17055);box-shadow:0 4px 16px rgba(253,203,110,0.45);}
     .btn.outline{
-      background:transparent;
-      border:2.5px solid #ee5a24;
-      color:#ee5a24;font-weight:700;
-      box-shadow:none;
+      background:transparent;border:2.5px solid #ee5a24;
+      color:#ee5a24;font-weight:700;box-shadow:none;
     }
     .btn.outline:hover{background:rgba(238,90,36,0.06);}
     .btn-ghost{
@@ -74,8 +76,6 @@
       border:2px solid #e8e8e8;
     }
     .code-hint{font-size:12px;color:#aaa;text-align:center;margin-top:-4px;}
-
-    /* Copy button */
     #btn-copy{
       background:none;border:1.5px solid #ccc;border-radius:20px;
       color:#888;font-size:12px;padding:5px 14px;cursor:pointer;
@@ -84,7 +84,6 @@
     #btn-copy:hover{border-color:#888;color:#444;}
     #btn-copy.copied{border-color:#00b894;color:#00b894;}
 
-    /* Status messages */
     .status-msg{
       font-size:13px;color:#888;text-align:center;
       min-height:18px;padding:0 8px;line-height:1.4;
@@ -92,7 +91,6 @@
     .status-msg.error{color:#e17055;}
     .status-msg.success{color:#00b894;}
 
-    /* Code input */
     #code-input{
       width:100%;padding:14px 10px;
       border:2.5px solid #e0e0e0;border-radius:16px;
@@ -104,16 +102,29 @@
     }
     #code-input:focus{border-color:#6c5ce7;box-shadow:0 0 0 3px rgba(108,92,231,0.15);}
 
-    /* Divider */
     .divider{width:100%;height:1px;background:#eee;margin:4px 0;}
 
-    /* ── Game wrapper ── */
-    #game-wrapper{
-      display:flex;flex-direction:column;align-items:center;gap:10px;
+    /* Leaderboard */
+    #board-list{
+      width:100%;display:flex;flex-direction:column;gap:6px;
+      max-height:46vh;overflow-y:auto;
     }
+    .board-row{
+      display:flex;align-items:center;gap:10px;
+      background:#f8f8f8;border-radius:14px;padding:9px 14px;
+    }
+    .board-row.top1{background:linear-gradient(135deg,#fff3cd,#ffeaa7);}
+    .board-row.top2{background:#f1f2f6;}
+    .board-row.top3{background:#fdf0e7;}
+    .board-rank{font-size:16px;font-weight:900;color:#999;width:32px;text-align:center;}
+    .board-alias{flex:1;font-size:15px;font-weight:700;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .board-score{font-size:17px;font-weight:900;color:#e17055;}
+    .board-empty{font-size:14px;color:#aaa;text-align:center;padding:20px 0;}
+
+    /* ── Game wrapper ── */
+    #game-wrapper{display:flex;flex-direction:column;align-items:center;gap:10px;}
     #game-wrapper.hidden{display:none;}
 
-    /* Solo HUD */
     #solo-hud{
       display:flex;align-items:center;justify-content:space-between;
       padding:7px 16px;
@@ -122,12 +133,13 @@
       box-shadow:0 2px 14px rgba(0,0,0,0.1);
     }
     #solo-hud.hidden{display:none;}
-    .hb{display:flex;flex-direction:column;align-items:center;min-width:56px;}
+    .hb{display:flex;flex-direction:column;align-items:center;min-width:48px;}
     .hl{font-size:10px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.06em;}
     .hv{font-size:22px;font-weight:900;color:#111;line-height:1.1;}
+    #hv-combo{color:#999;transition:color .15s,transform .15s;}
+    #hv-combo.hot{color:#e17055;}
     #lives-row{display:flex;gap:3px;font-size:20px;}
 
-    /* Canvas */
     #canvas-container{position:relative;}
     canvas{
       display:block;border-radius:20px;
@@ -135,20 +147,46 @@
       touch-action:none;cursor:pointer;
     }
 
-    /* Canvas overlays */
+    /* Overlays */
     .overlay{
       position:absolute;inset:0;border-radius:20px;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
-      gap:14px;padding:24px;text-align:center;
+      gap:13px;padding:24px;text-align:center;
     }
     .overlay.hidden{display:none;}
 
-    #ov-gameover{background:rgba(10,10,30,0.72);color:#fff;backdrop-filter:blur(4px);}
-    #ov-gameover .go-title{font-size:clamp(24px,7vw,42px);font-weight:900;text-shadow:0 2px 10px rgba(0,0,0,0.5);}
-    .go-score{font-size:clamp(44px,11vw,68px);font-weight:900;color:#ffd32a;line-height:1;text-shadow:0 2px 14px rgba(0,0,0,0.3);}
-    .go-sub{font-size:clamp(13px,3.5vw,17px);opacity:.85;max-width:280px;line-height:1.5;}
+    #ov-gameover{background:rgba(10,10,30,0.74);color:#fff;backdrop-filter:blur(4px);}
+    #ov-gameover .go-title{font-size:clamp(24px,7vw,40px);font-weight:900;text-shadow:0 2px 10px rgba(0,0,0,0.5);}
+    .go-score{font-size:clamp(40px,10vw,62px);font-weight:900;color:#ffd32a;line-height:1;text-shadow:0 2px 14px rgba(0,0,0,0.3);}
+    .go-sub{font-size:clamp(13px,3.5vw,16px);opacity:.85;max-width:280px;line-height:1.5;}
     .ov-btns{display:flex;gap:10px;width:100%;max-width:280px;}
     .ov-btns .btn{font-size:15px;padding:12px 0;}
+
+    /* Save-score form inside game over */
+    #save-box{
+      display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px;
+    }
+    #save-box.hidden{display:none;}
+    #save-row{display:flex;gap:8px;}
+    #alias-input{
+      flex:1;min-width:0;padding:11px 14px;
+      border:2px solid rgba(255,255,255,0.3);border-radius:14px;
+      background:rgba(255,255,255,0.12);color:#fff;
+      font-size:16px;font-weight:700;font-family:inherit;
+      outline:none;text-align:center;
+    }
+    #alias-input::placeholder{color:rgba(255,255,255,0.45);font-weight:600;}
+    #alias-input:focus{border-color:rgba(255,255,255,0.7);}
+    #btn-save{
+      padding:11px 18px;border:none;border-radius:14px;
+      background:linear-gradient(135deg,#fdcb6e,#e17055);
+      color:#fff;font-size:15px;font-weight:800;cursor:pointer;
+      font-family:inherit;white-space:nowrap;
+    }
+    #btn-save:disabled{opacity:.55;cursor:default;}
+    #save-status{font-size:12px;min-height:16px;opacity:.9;}
+    #save-status.ok{color:#7bed9f;}
+    #save-status.err{color:#ff7f50;}
 
     #ov-countdown{background:rgba(0,0,0,0.5);color:#fff;backdrop-filter:blur(3px);}
     #cd-num{
@@ -169,11 +207,9 @@
     @keyframes spin{to{transform:rotate(360deg);}}
     #ov-connecting p{font-size:18px;font-weight:700;opacity:.9;}
 
-    /* Volley point flash */
     #ov-point{background:rgba(0,0,0,0.5);color:#fff;}
-    #ov-point.hidden{display:none;}
     .point-text{font-size:clamp(28px,8vw,48px);font-weight:900;line-height:1.2;}
-    .point-sub {font-size:16px;opacity:.8;}
+    .point-sub{font-size:16px;opacity:.8;}
   </style>
 </head>
 <body>
@@ -187,6 +223,7 @@
     <div class="divider"></div>
     <button class="btn" id="btn-solo">🎮 Solo</button>
     <button class="btn secondary" id="btn-2p">👥 2 Player</button>
+    <button class="btn gold" id="btn-board">🏆 Leaderboard</button>
   </div>
 </div>
 
@@ -225,11 +262,21 @@
   </div>
 </div>
 
+<div id="screen-board" class="screen hidden">
+  <div class="card">
+    <div class="card-emoji">🏆</div>
+    <h2>High Scores</h2>
+    <div id="board-list"><div class="board-empty">Loading…</div></div>
+    <button class="btn-ghost" id="btn-back-board">← Back</button>
+  </div>
+</div>
+
 <!-- ════════ GAME ════════ -->
 <div id="game-wrapper" class="hidden">
 
   <div id="solo-hud" class="hidden">
     <div class="hb"><span class="hl">Score</span><span class="hv" id="hv-score">0</span></div>
+    <div class="hb"><span class="hl">Combo</span><span class="hv" id="hv-combo">×1</span></div>
     <div class="hb"><span class="hl">Balloons</span><span class="hv" id="hv-count">1</span></div>
     <div class="hb"><span class="hl">Lives</span><div id="lives-row">🎈🎈🎈</div></div>
   </div>
@@ -237,11 +284,18 @@
   <div id="canvas-container">
     <canvas id="gameCanvas"></canvas>
 
-    <!-- Overlays -->
     <div id="ov-gameover" class="overlay hidden">
       <div class="go-title" id="go-title">Game Over!</div>
       <div class="go-score" id="go-score">0</div>
       <div class="go-sub" id="go-sub"></div>
+      <div id="save-box" class="hidden">
+        <div id="save-row">
+          <input id="alias-input" type="text" maxlength="12" placeholder="Your name"
+                 autocomplete="off" autocorrect="off" spellcheck="false"/>
+          <button id="btn-save">Save</button>
+        </div>
+        <div id="save-status"></div>
+      </div>
       <div class="ov-btns">
         <button class="btn" id="btn-again">Again</button>
         <button class="btn outline" id="btn-menu">Menu</button>
@@ -270,10 +324,19 @@
 (function(){
 'use strict';
 
+// ════════════════════════════════════════════════════════════════════════
+// LEADERBOARD CONFIG — paste your Supabase project values here.
+// See README.md for the one-time database setup (table + policies).
+// Leave blank to hide all leaderboard features.
+// ════════════════════════════════════════════════════════════════════════
+const SUPABASE_URL      = '';   // e.g. 'https://abcdefgh.supabase.co'
+const SUPABASE_ANON_KEY = '';   // your project's anon/public key
+
 // ── Constants ─────────────────────────────────────────────────────────────
 const W=480, H=640, GROUND_Y=H-30, NET_Y=H/2;
 const COLORS=['#ff4d4d','#ff9f43','#ffd32a','#0be881','#00d2d3','#5f27cd','#ff6b81','#ff6348'];
 const PEER_PFX='btap-';
+const COMBO_WINDOW=2000;   // ms between taps to keep a combo alive
 
 // ── Canvas ────────────────────────────────────────────────────────────────
 const canvas=document.getElementById('gameCanvas');
@@ -297,7 +360,7 @@ window.addEventListener('resize',resize);
 
 // ── Screens ───────────────────────────────────────────────────────────────
 function show(id){
-  ['menu','2p','host','join'].forEach(s=>{
+  ['menu','2p','host','join','board'].forEach(s=>{
     document.getElementById('screen-'+s).classList.toggle('hidden',s!==id);
   });
   const gw=document.getElementById('game-wrapper');
@@ -349,31 +412,23 @@ function bgSolo(){
 
 function bgVolley(){
   ctx.fillStyle='#6ec6f0';ctx.fillRect(0,0,W,H);
-  // subtle sky gradient per half
   const gH=ctx.createLinearGradient(0,H,0,NET_Y);
   gH.addColorStop(0,'rgba(200,240,200,0.35)');gH.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=gH;ctx.fillRect(0,NET_Y,W,H-NET_Y);
   const gJ=ctx.createLinearGradient(0,0,0,NET_Y);
   gJ.addColorStop(0,'rgba(200,240,200,0.35)');gJ.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=gJ;ctx.fillRect(0,0,W,NET_Y);
-  // clouds host half
   cloud(80,H*.72,.85);cloud(330,H*.8,.78);
-  // clouds joiner half
   cloud(150,H*.12,.8);cloud(360,H*.22,.72);
-  // ground strips
   ctx.fillStyle='#5cb85c';ctx.fillRect(0,H-25,W,25);ctx.fillRect(0,0,W,25);
   ctx.fillStyle='#4cae4c';ctx.fillRect(0,H-25,W,4);ctx.fillRect(0,21,W,4);
-  // net band
   ctx.fillStyle='rgba(0,0,0,0.08)';ctx.fillRect(0,NET_Y-18,W,36);
-  // vertical net lines
   ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1;
   for(let x=0;x<W;x+=22){
     ctx.beginPath();ctx.moveTo(x,NET_Y-17);ctx.lineTo(x,NET_Y+17);ctx.stroke();
   }
-  // net tapes
   ctx.fillStyle='rgba(255,255,255,0.9)';
   ctx.fillRect(0,NET_Y-18,W,5);ctx.fillRect(0,NET_Y+13,W,5);
-  // net posts
   ctx.fillStyle='#888';
   ctx.fillRect(-3,NET_Y-24,7,48);ctx.fillRect(W-4,NET_Y-24,7,48);
 }
@@ -384,37 +439,35 @@ function drawBalloon(b){
   const sc=b.tapAnim>0?1+.15*Math.sin(b.tapAnim*Math.PI):1;
   ctx.scale(sc,sc);
   const{rx,ry,color}=b;
-  // shadow
   ctx.save();ctx.scale(1,.35);
   const sg=ctx.createRadialGradient(0,ry+22,0,0,ry+22,rx);
   sg.addColorStop(0,'rgba(0,0,0,0.2)');sg.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=sg;ctx.beginPath();
   ctx.ellipse(0,ry+22,rx*1.1,rx*1.1,0,0,Math.PI*2);ctx.fill();ctx.restore();
-  // body
   const g=ctx.createRadialGradient(-rx*.3,-ry*.35,rx*.05,0,0,rx*1.8);
   g.addColorStop(0,li(color,65));g.addColorStop(.45,color);g.addColorStop(1,dk(color,45));
   ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.fill();
-  // shine
   ctx.fillStyle='rgba(255,255,255,0.42)';ctx.beginPath();
   ctx.ellipse(-rx*.28,-ry*.3,rx*.3,ry*.18,-0.4,0,Math.PI*2);ctx.fill();
-  // knot
   ctx.fillStyle=dk(color,55);ctx.beginPath();ctx.arc(0,ry+1,5,0,Math.PI*2);ctx.fill();
-  // string
   ctx.strokeStyle='rgba(60,30,0,0.5)';ctx.lineWidth=1.3;
   ctx.beginPath();ctx.moveTo(0,ry+6);ctx.quadraticCurveTo(9,ry+28,1,ry+52);ctx.stroke();
   ctx.restore();
 }
 
 // ── Tap labels ────────────────────────────────────────────────────────────
-function drawLabels(arr){
+// Labels live in logical coords; when `flip` is true (joiner view) the
+// y-coordinate is mirrored at draw time so text renders upright.
+function drawLabels(arr,flip){
   ctx.textAlign='center';ctx.textBaseline='middle';
   for(const t of arr){
+    const y=flip?H-t.y:t.y;
     ctx.globalAlpha=t.life;
-    const sz=Math.round(18+(1-t.life)*8);
+    const sz=Math.round(18+(1-t.life)*8+(t.big?6:0));
     ctx.font=`900 ${sz}px 'Segoe UI',Arial`;
     ctx.lineWidth=3.5;ctx.strokeStyle='rgba(0,0,0,0.28)';
-    ctx.strokeText(t.text||'+1',t.x,t.y);
-    ctx.fillStyle=t.color||'#fff';ctx.fillText(t.text||'+1',t.x,t.y);
+    ctx.strokeText(t.text||'+1',t.x,y);
+    ctx.fillStyle=t.color||'#fff';ctx.fillText(t.text||'+1',t.x,y);
   }
   ctx.globalAlpha=1;ctx.textAlign='left';ctx.textBaseline='alphabetic';
 }
@@ -451,6 +504,20 @@ function logicalPos(e,flipY){
   return{x,y};
 }
 
+// ── Wake lock (keeps phone screen on during play) ─────────────────────────
+let wakeLock=null;
+async function acquireWake(){
+  try{
+    if('wakeLock' in navigator) wakeLock=await navigator.wakeLock.request('screen');
+  }catch(e){/* not critical */}
+}
+function releaseWake(){
+  if(wakeLock){try{wakeLock.release();}catch(e){}wakeLock=null;}
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&(S||V)) acquireWake();
+});
+
 // ══════════════════════════════════════════════════════════════════════════
 // SOLO
 // ══════════════════════════════════════════════════════════════════════════
@@ -467,21 +534,24 @@ function mkBalloon(ci){
 
 function startSolo(){
   cancelRaf();
-  S={bs:[],pts:[],lbls:[],score:0,lives:3,timer:0,ci:0,last:0};
+  S={bs:[],pts:[],lbls:[],score:0,lives:3,timer:0,ci:0,last:0,
+     combo:1,lastTap:0};
   S.bs.push(mkBalloon(S.ci++));
   document.getElementById('solo-hud').classList.remove('hidden');
   refreshSoloHud();
   show('game');hideOvs();
+  acquireWake();
   S.last=performance.now();
   raf=requestAnimationFrame(soloFrame);
 }
 
 function soloFrame(ts){
+  if(!S)return;
   const dt=Math.min(ts-S.last,50);S.last=ts;
-  // add balloon every 10s
   S.timer+=dt;
   if(S.timer>=10000){S.timer-=10000;S.bs.push(mkBalloon(S.ci++));refreshSoloHud();}
-  // update
+  // combo expiry
+  if(S.combo>1 && ts-S.lastTap>COMBO_WINDOW){S.combo=1;refreshSoloHud();}
   for(let i=S.bs.length-1;i>=0;i--){
     const b=S.bs[i];if(b.popped)continue;
     b.vy+=.08;b.x+=b.vx;b.y+=b.vy;
@@ -493,7 +563,7 @@ function soloFrame(ts){
     if(b.y+b.ry>=GROUND_Y){
       b.popped=true;
       burst(S.pts,b.x,GROUND_Y,b.color);
-      S.lives--;refreshSoloHud();
+      S.lives--;S.combo=1;refreshSoloHud();
       if(S.lives<=0){soloOver();return;}
     }
   }
@@ -502,10 +572,9 @@ function soloFrame(ts){
   for(let i=S.lbls.length-1;i>=0;i--){
     const l=S.lbls[i];l.y+=l.vy;l.life-=.028;if(l.life<=0)S.lbls.splice(i,1);
   }
-  // draw
   ctx.clearRect(0,0,W,H);bgSolo();
   S.bs.filter(b=>!b.popped).forEach(b=>drawBalloon(b));
-  drawParticles(S.pts);drawLabels(S.lbls);
+  drawParticles(S.pts);drawLabels(S.lbls,false);
   raf=requestAnimationFrame(soloFrame);
 }
 
@@ -518,8 +587,20 @@ function soloTap(e){
     if(dx*dx+dy*dy<=1){
       b.vy=-(6+Math.random()*3);b.vx+=(Math.random()-.5)*1.5;
       b.vx=Math.max(-1.8,Math.min(1.8,b.vx));
-      b.tapAnim=1;S.score++;
-      S.lbls.push({x:b.x,y:b.y-b.ry-10,vy:-1.5,life:1});
+      b.tapAnim=1;
+      // combo: chain taps within the window to multiply points
+      const now=performance.now();
+      if(now-S.lastTap<=COMBO_WINDOW) S.combo++;
+      else S.combo=1;
+      S.lastTap=now;
+      S.score+=S.combo;
+      const hot=S.combo>=5, warm=S.combo>=3;
+      S.lbls.push({
+        x:b.x,y:b.y-b.ry-10,vy:-1.5,life:1,
+        text:'+'+S.combo,
+        color:hot?'#ff6b6b':warm?'#ffd32a':'#fff',
+        big:hot
+      });
       refreshSoloHud();break;
     }
   }
@@ -528,24 +609,113 @@ function soloTap(e){
 function refreshSoloHud(){
   document.getElementById('hv-score').textContent=S.score;
   document.getElementById('hv-count').textContent=S.bs.filter(b=>!b.popped).length;
+  const cEl=document.getElementById('hv-combo');
+  cEl.textContent='×'+S.combo;
+  cEl.classList.toggle('hot',S.combo>=3);
   document.getElementById('lives-row').textContent=
     S.lives>0?'🎈'.repeat(S.lives):'💀';
 }
 
 function soloOver(){
-  cancelRaf();
+  cancelRaf();releaseWake();
   const sc=S.score;S=null;
   document.getElementById('go-title').textContent='Game Over!';
   document.getElementById('go-score').textContent=sc;
-  document.getElementById('go-sub').textContent=`You scored ${sc} tap${sc!==1?'s':''}!`;
+  document.getElementById('go-sub').textContent=`You scored ${sc} point${sc!==1?'s':''}!`;
   document.getElementById('btn-again').onclick=startSolo;
+  setupSaveBox(sc);
   showOv('gameover');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// LEADERBOARD (Supabase REST — no SDK needed)
+// ══════════════════════════════════════════════════════════════════════════
+const sbConfigured=()=>Boolean(SUPABASE_URL&&SUPABASE_ANON_KEY);
+const sbHeaders=()=>({
+  'apikey':SUPABASE_ANON_KEY,
+  'Authorization':'Bearer '+SUPABASE_ANON_KEY,
+  'Content-Type':'application/json'
+});
+let lastAlias='';   // remembered for the session
+
+async function sbSave(alias,score){
+  const res=await fetch(SUPABASE_URL+'/rest/v1/scores',{
+    method:'POST',
+    headers:{...sbHeaders(),'Prefer':'return=minimal'},
+    body:JSON.stringify({alias,score})
+  });
+  if(!res.ok) throw new Error('save failed ('+res.status+')');
+}
+
+async function sbTop(limit){
+  const res=await fetch(
+    SUPABASE_URL+'/rest/v1/scores?select=alias,score&order=score.desc&limit='+(limit||20),
+    {headers:sbHeaders()});
+  if(!res.ok) throw new Error('load failed ('+res.status+')');
+  return res.json();
+}
+
+function setupSaveBox(score){
+  const box=document.getElementById('save-box');
+  if(!sbConfigured()||score<=0){box.classList.add('hidden');return;}
+  box.classList.remove('hidden');
+  const input=document.getElementById('alias-input');
+  const btn=document.getElementById('btn-save');
+  const st=document.getElementById('save-status');
+  input.value=lastAlias;input.disabled=false;
+  btn.disabled=false;btn.textContent='Save';
+  st.textContent='';st.className='';
+  btn.onclick=async()=>{
+    const alias=input.value.trim().slice(0,12);
+    if(!alias){st.textContent='Enter a name first';st.className='err';return;}
+    lastAlias=alias;
+    btn.disabled=true;input.disabled=true;btn.textContent='Saving…';
+    try{
+      await sbSave(alias,score);
+      st.textContent='Saved! 🎉';st.className='ok';
+      btn.textContent='Saved';
+    }catch(err){
+      st.textContent='Could not save — try again';st.className='err';
+      btn.disabled=false;input.disabled=false;btn.textContent='Save';
+    }
+  };
+}
+
+async function openBoard(){
+  show('board');
+  const list=document.getElementById('board-list');
+  if(!sbConfigured()){
+    list.innerHTML='<div class="board-empty">Leaderboard not set up yet.<br>Add Supabase keys in index.html — see README.</div>';
+    return;
+  }
+  list.innerHTML='<div class="board-empty">Loading…</div>';
+  try{
+    const rows=await sbTop(20);
+    if(!rows.length){
+      list.innerHTML='<div class="board-empty">No scores yet — be the first!</div>';
+      return;
+    }
+    const medals=['🥇','🥈','🥉'];
+    list.innerHTML=rows.map((r,i)=>{
+      const cls=i===0?'top1':i===1?'top2':i===2?'top3':'';
+      const rank=i<3?medals[i]:(i+1);
+      const alias=String(r.alias).replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+      return`<div class="board-row ${cls}">
+        <span class="board-rank">${rank}</span>
+        <span class="board-alias">${alias}</span>
+        <span class="board-score">${r.score}</span>
+      </div>`;
+    }).join('');
+  }catch(err){
+    list.innerHTML='<div class="board-empty">Couldn\'t load scores — check your connection.</div>';
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════
 // VOLLEYBALL
 // ══════════════════════════════════════════════════════════════════════════
 let V=null, vConn=null, vPeer=null, vRole=null;
+let rematchLock=false;
 
 const BRX=32, BRY=40;
 
@@ -559,11 +729,14 @@ function startVolley(role,conn){
   cancelRaf();
   vRole=role;vConn=conn;
   V={ball:freshBall(0),scores:{host:0,joiner:0},
-     pts:[],lbls:[],paused:false,pauseTimer:0,last:0};
+     pts:[],lbls:[],paused:false,pauseTimer:0,last:0,nextServe:'host'};
   document.getElementById('solo-hud').classList.add('hidden');
+  document.getElementById('save-box').classList.add('hidden');
   show('game');
+  acquireWake();
   countdown(()=>{
     hideOvs();
+    rematchLock=false;   // game underway; allow a future rematch
     if(vRole==='host') V.ball.vy=4;
     V.last=performance.now();
     raf=requestAnimationFrame(volleyFrame);
@@ -577,7 +750,8 @@ function countdown(cb){
   let i=0;
   function tick(){
     el.textContent=steps[i];
-    el.style.animation='none';void el.offsetHeight;el.style.animation='cdpop .55s cubic-bezier(.22,1,.36,1)';
+    el.style.animation='none';void el.offsetHeight;
+    el.style.animation='cdpop .55s cubic-bezier(.22,1,.36,1)';
     i++;
     if(i<steps.length)setTimeout(tick,700);else setTimeout(cb,600);
   }
@@ -590,16 +764,14 @@ function volleyFrame(ts){
   const b=V.ball;
 
   if(!V.paused && vRole==='host'){
-    b.vy+=b.y>NET_Y?0.10:-0.10; // dual gravity
+    b.vy+=b.y>NET_Y?0.10:-0.10;
     b.x+=b.vx;b.y+=b.vy;
     if(b.x-b.rx<0){b.x=b.rx;b.vx=Math.abs(b.vx)*.78;}
     if(b.x+b.rx>W){b.x=W-b.rx;b.vx=-Math.abs(b.vx)*.78;}
     b.vx+=(Math.random()-.5)*.03;b.vx=Math.max(-3,Math.min(3,b.vx));
     if(b.tapAnim>0)b.tapAnim=Math.max(0,b.tapAnim-dt/180);
-    // score check
     if(b.y>=H){doScore('joiner');return;}
     if(b.y<=0){doScore('host');return;}
-    // sync joiner
     vSend({type:'state',
            b:{x:b.x,y:b.y,vx:b.vx,vy:b.vy,tapAnim:b.tapAnim,color:b.color},
            scores:V.scores});
@@ -609,7 +781,7 @@ function volleyFrame(ts){
     if(b.tapAnim>0)b.tapAnim=Math.max(0,b.tapAnim-dt/180);
   }
 
-  // pause countdown between points
+  // shared pause countdown — both roles pause and resume together
   if(V.paused){
     V.pauseTimer-=dt;
     if(V.pauseTimer<=0){
@@ -630,28 +802,39 @@ function volleyFrame(ts){
   raf=requestAnimationFrame(volleyFrame);
 }
 
-function doScore(winner){
-  V.scores[winner]++;
-  burst(V.pts,V.ball.x,winner==='joiner'?H:0,V.ball.color,22);
-  vSend({type:'scored',scores:V.scores});
-  if(V.scores[winner]>=5){vSend({type:'gameover',winner});endVolley(winner);return;}
-  V.paused=true;V.pauseTimer=1800;V.nextServe=winner;
+function showPointFlash(winner){
   const iWon=(vRole===winner);
   document.getElementById('pt-text').textContent=iWon?'Point! 🎉':'Oops! 😬';
-  document.getElementById('pt-sub').textContent=
-    `${V.scores.host} – ${V.scores.joiner}`;
+  document.getElementById('pt-sub').textContent=`${V.scores.host} – ${V.scores.joiner}`;
   showOv('point');
 }
 
+function doScore(winner){
+  V.scores[winner]++;
+  burst(V.pts,V.ball.x,winner==='joiner'?H:0,V.ball.color,22);
+  if(V.scores[winner]>=5){
+    vSend({type:'gameover',winner});
+    endVolley(winner);return;
+  }
+  vSend({type:'scored',scores:V.scores,winner});
+  V.paused=true;V.pauseTimer=1800;V.nextServe=winner;
+  showPointFlash(winner);
+}
+
 function endVolley(winner){
-  cancelRaf();
+  cancelRaf();releaseWake();
+  rematchLock=false;
   const iWin=(vRole===winner);
   document.getElementById('go-title').textContent=iWin?'You Win! 🎉':'You Lose 😢';
   document.getElementById('go-score').textContent=`${V.scores.host} – ${V.scores.joiner}`;
   document.getElementById('go-sub').textContent=
     iWin?'Amazing rally!':'Better luck next time!';
+  document.getElementById('save-box').classList.add('hidden');
   document.getElementById('btn-again').onclick=()=>{
-    vSend({type:'rematch'});startVolley(vRole,vConn);
+    if(rematchLock)return;      // already restarting (peer beat us to it)
+    rematchLock=true;
+    vSend({type:'rematch'});
+    startVolley(vRole,vConn);
   };
   showOv('gameover');
 }
@@ -661,19 +844,21 @@ function volleyTap(e){
   const b=V.ball;
   const isJoiner=vRole==='joiner';
   const p=logicalPos(e,isJoiner);
-  // hit test
-  const dx=(p.x-b.x)/(b.rx*1.5),dy=(p.y-b.y)/(b.ry*1.5);
+  // joiner sees slightly stale ball positions (network latency),
+  // so give them a more forgiving hit radius
+  const hitR=isJoiner?1.75:1.5;
+  const dx=(p.x-b.x)/(b.rx*hitR),dy=(p.y-b.y)/(b.ry*hitR);
   if(dx*dx+dy*dy>1)return;
   if(vRole==='host'){
-    if(b.y<NET_Y-50)return; // must be in host zone
+    if(b.y<NET_Y-50)return;
     b.vy=-(12+Math.random()*2.5);
     b.vx+=(p.x-b.x)/b.rx*1.8;b.vx=Math.max(-3,Math.min(3,b.vx));
     b.tapAnim=1;
     V.lbls.push({x:b.x,y:b.y-b.ry-12,vy:-1.5,life:1});
   } else {
-    if(b.y>NET_Y+50)return; // must be in joiner zone
+    if(b.y>NET_Y+50)return;
     vSend({type:'tap',x:p.x,y:p.y});
-    b.tapAnim=1; // optimistic
+    b.tapAnim=1;
     V.lbls.push({x:b.x,y:b.y+b.ry+12,vy:1.5,life:1});
   }
 }
@@ -688,35 +873,30 @@ function drawVolley(){
   drawBalloon(b);
   drawParticles(V.pts);
   if(flip)ctx.restore();
-  // labels drawn in logical space
-  if(flip){ctx.save();ctx.translate(0,H);ctx.scale(1,-1);}
-  drawLabels(V.lbls);
-  if(flip)ctx.restore();
-  // HUD always in screen space
+  // labels are drawn OUTSIDE the flip so text is never mirrored;
+  // drawLabels mirrors the y-coordinate itself when flip is true
+  drawLabels(V.lbls,flip);
   drawVolleyHUD();
 }
 
 function drawVolleyHUD(){
   const my =vRole==='host'?V.scores.host  :V.scores.joiner;
   const opp=vRole==='host'?V.scores.joiner:V.scores.host;
-  // pills
   ctx.save();
-  // opponent top
-  pill(ctx,W/2,18,130,34,'rgba(0,0,0,0.38)');
+  pill(W/2,18,130,34,'rgba(0,0,0,0.38)');
   ctx.fillStyle='rgba(255,255,255,0.92)';
   ctx.font='700 14px Segoe UI,Arial';ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.fillText('THEM',W/2-22,18);
   ctx.font='900 22px Segoe UI,Arial';ctx.fillStyle='#fff';ctx.fillText(opp,W/2+26,18);
-  // me bottom
-  pill(ctx,W/2,H-18,130,34,'rgba(0,0,0,0.38)');
+  pill(W/2,H-18,130,34,'rgba(0,0,0,0.38)');
   ctx.fillStyle='rgba(255,255,200,0.9)';
-  ctx.font='700 14px Segoe UI,Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='700 14px Segoe UI,Arial';
   ctx.fillText('YOU',W/2-22,H-18);
   ctx.font='900 22px Segoe UI,Arial';ctx.fillStyle='#ffd32a';ctx.fillText(my,W/2+26,H-18);
   ctx.restore();
 }
 
-function pill(ctx,cx,cy,w,h,fill){
+function pill(cx,cy,w,h,fill){
   const x=cx-w/2,y=cy-h/2,r=h/2;
   ctx.fillStyle=fill;
   ctx.beginPath();
@@ -732,6 +912,12 @@ function pill(ctx,cx,cy,w,h,fill){
 function vSend(msg){try{if(vConn&&vConn.open)vConn.send(msg);}catch(e){}}
 
 function vRecv(msg){
+  if(msg.type==='rematch'){
+    if(rematchLock)return;     // we already initiated this rematch
+    rematchLock=true;
+    startVolley(vRole,vConn);
+    return;
+  }
   if(!V)return;
   const b=V.ball;
   if(msg.type==='state'){
@@ -739,26 +925,31 @@ function vRecv(msg){
     if(msg.b.color)b.color=msg.b.color;
     V.scores=msg.scores;
   } else if(msg.type==='tap'){
+    if(V.paused)return;        // ignore taps that arrive during a pause
     if(b.y>NET_Y+50)return;
     b.vy=12+Math.random()*2.5;
     b.vx+=(msg.x-b.x)/b.rx*1.8;b.vx=Math.max(-3,Math.min(3,b.vx));
     b.tapAnim=1;
     V.lbls.push({x:b.x,y:b.y-b.ry-12,vy:-1.5,life:1});
   } else if(msg.type==='scored'){
+    // joiner pauses and shows the point flash, mirroring the host
     V.scores=msg.scores;
+    V.paused=true;V.pauseTimer=1800;
+    burst(V.pts,b.x,msg.winner==='joiner'?H:0,b.color,22);
+    showPointFlash(msg.winner);
   } else if(msg.type==='gameover'){
+    V.scores=msg.scores||V.scores;
     endVolley(msg.winner);
-  } else if(msg.type==='rematch'){
-    startVolley(vRole,vConn);
   }
 }
 
 function onDrop(){
-  cancelRaf();
+  cancelRaf();releaseWake();
   document.getElementById('go-title').textContent='Connection Lost';
   document.getElementById('go-score').textContent='';
   document.getElementById('go-sub').textContent='Your opponent disconnected.';
-  document.getElementById('btn-again').onclick=()=>goMenu();
+  document.getElementById('save-box').classList.add('hidden');
+  document.getElementById('btn-again').onclick=goMenu;
   showOv('gameover');
 }
 
@@ -771,26 +962,22 @@ function genCode(){
 
 function doHost(){
   show('host');
-  document.getElementById('status-host').textContent='Generating code…';
-  document.getElementById('status-host').className='status-msg';
+  const st=document.getElementById('status-host');
+  st.textContent='Generating code…';st.className='status-msg';
   const code=genCode();
   document.getElementById('code-display').textContent=code;
   destroyPeer();
   vPeer=new Peer(PEER_PFX+code);
-  vPeer.on('open',()=>{
-    document.getElementById('status-host').textContent='Waiting for opponent to join…';
-  });
+  vPeer.on('open',()=>{st.textContent='Waiting for opponent to join…';});
   vPeer.on('error',err=>{
     if(err.type==='unavailable-id'){doHost();return;}
-    document.getElementById('status-host').textContent='Error: '+err.message;
-    document.getElementById('status-host').className='status-msg error';
+    st.textContent='Error: '+err.message;st.className='status-msg error';
   });
   vPeer.on('connection',conn=>{
     vConn=conn;
     conn.on('open',()=>{
       conn.on('data',vRecv);conn.on('close',onDrop);
-      document.getElementById('status-host').textContent='Opponent joined! Starting…';
-      document.getElementById('status-host').className='status-msg success';
+      st.textContent='Opponent joined! Starting…';st.className='status-msg success';
       setTimeout(()=>startVolley('host',conn),700);
     });
     conn.on('error',onDrop);
@@ -807,7 +994,9 @@ function doJoin(){
   vPeer.on('open',()=>{
     const conn=vPeer.connect(PEER_PFX+raw,{reliable:true});
     vConn=conn;
-    const tout=setTimeout(()=>{sj.textContent="Couldn't connect — check the code";sj.className='status-msg error';},9000);
+    const tout=setTimeout(()=>{
+      sj.textContent="Couldn't connect — check the code";sj.className='status-msg error';
+    },9000);
     conn.on('open',()=>{
       clearTimeout(tout);
       conn.on('data',vRecv);conn.on('close',onDrop);conn.on('error',onDrop);
@@ -830,7 +1019,8 @@ function destroyPeer(){
 function cancelRaf(){if(raf){cancelAnimationFrame(raf);raf=null;}}
 
 function goMenu(){
-  cancelRaf();S=null;V=null;
+  cancelRaf();releaseWake();
+  S=null;V=null;rematchLock=false;
   if(vConn){try{vConn.close();}catch(e){}vConn=null;}
   destroyPeer();
   document.getElementById('solo-hud').classList.add('hidden');
@@ -852,12 +1042,14 @@ document.getElementById('btn-solo').onclick=()=>{
   startSolo();
 };
 document.getElementById('btn-2p').onclick=()=>show('2p');
+document.getElementById('btn-board').onclick=openBoard;
+document.getElementById('btn-back-board').onclick=()=>show('menu');
 document.getElementById('btn-back-2p').onclick=()=>show('menu');
 document.getElementById('btn-host').onclick=doHost;
 document.getElementById('btn-join-screen').onclick=()=>{
   document.getElementById('code-input').value='';
-  document.getElementById('status-join').textContent='';
-  document.getElementById('status-join').className='status-msg';
+  const sj=document.getElementById('status-join');
+  sj.textContent='';sj.className='status-msg';
   show('join');
   setTimeout(()=>document.getElementById('code-input').focus(),120);
 };
@@ -869,12 +1061,12 @@ document.getElementById('btn-copy').onclick=function(){
   const code=document.getElementById('code-display').textContent;
   if(navigator.clipboard){
     navigator.clipboard.writeText(code).then(()=>{
-      this.textContent='Copied!';this.className='copied';
-      setTimeout(()=>{this.textContent='Copy Code';this.className='';},2000);
+      this.textContent='Copied!';this.classList.add('copied');
+      setTimeout(()=>{this.textContent='Copy Code';this.classList.remove('copied');},2000);
     });
   }
 };
-document.getElementById('btn-again').onclick=startSolo; // default, overwritten per mode
+document.getElementById('btn-again').onclick=startSolo;
 document.getElementById('btn-menu').onclick=goMenu;
 
 // ── Init ──────────────────────────────────────────────────────────────────
