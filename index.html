@@ -333,7 +333,24 @@ const SUPABASE_URL      = 'https://mhktyejanikvdnjbndgi.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_ghD1UY99uWhrEyGqIzoRXA_wn3-_9kh';
 
 // ── Constants ─────────────────────────────────────────────────────────────
-const W=480, H=640, GROUND_Y=H-30, NET_Y=H/2;
+// W is fixed; H stretches to the device's aspect ratio when a game starts
+// (clamped 640–1100) so tall phone screens become extra playfield instead
+// of dead space. 2P: the host picks the field size and sends it to the
+// joiner so both simulate the same court.
+const W=480;
+let H=640, GROUND_Y=H-30, NET_Y=H/2;
+
+function setField(h){
+  H=h;GROUND_Y=H-30;NET_Y=H/2;
+  resize();
+}
+function computeFieldH(){
+  const sh=document.getElementById('solo-hud');
+  const hudH=sh.classList.contains('hidden')?0:(sh.offsetHeight+10);
+  const maxW=window.innerWidth-16, maxH=window.innerHeight-hudH-20;
+  const ideal=Math.round(W*maxH/maxW);
+  return Math.max(640,Math.min(1100,ideal));
+}
 const COLORS=['#ff4d4d','#ff9f43','#ffd32a','#0be881','#00d2d3','#5f27cd','#ff6b81','#ff6348'];
 const PEER_PFX='btap-';
 const COMBO_WINDOW=2000;   // ms between taps to keep a combo alive
@@ -405,7 +422,9 @@ function cloud(cx,cy,sc){
 
 function bgSolo(){
   ctx.fillStyle=skyG;ctx.fillRect(0,0,W,H);
-  cloud(60,80,.9);cloud(300,50,1.1);cloud(190,135,.7);cloud(400,115,.85);
+  cloud(60,H*.09,.9);cloud(300,H*.06,1.1);cloud(190,H*.17,.7);cloud(400,H*.14,.85);
+  if(H>760){cloud(120,H*.34,.75);cloud(370,H*.42,.85);}
+  if(H>950){cloud(240,H*.58,.7);}
   ctx.fillStyle='#5cb85c';ctx.fillRect(0,GROUND_Y,W,H-GROUND_Y);
   ctx.fillStyle='#4cae4c';ctx.fillRect(0,GROUND_Y,W,6);
 }
@@ -534,10 +553,11 @@ function mkBalloon(ci){
 
 function startSolo(){
   cancelRaf();
+  document.getElementById('solo-hud').classList.remove('hidden');
+  setField(computeFieldH());   // stretch playfield to this device
   S={bs:[],pts:[],lbls:[],score:0,lives:3,timer:0,ci:0,last:0,
      combo:1,lastTap:0};
   S.bs.push(mkBalloon(S.ci++));
-  document.getElementById('solo-hud').classList.remove('hidden');
   refreshSoloHud();
   show('game');hideOvs();
   acquireWake();
@@ -728,10 +748,15 @@ function freshBall(serveDir){
 function startVolley(role,conn){
   cancelRaf();
   vRole=role;vConn=conn;
-  V={ball:freshBall(0),scores:{host:0,joiner:0},
-     pts:[],lbls:[],paused:false,pauseTimer:0,last:0,nextServe:'host'};
   document.getElementById('solo-hud').classList.add('hidden');
   document.getElementById('save-box').classList.add('hidden');
+  if(role==='host'){
+    // host picks the court size and tells the joiner
+    setField(computeFieldH());
+    if(conn&&conn.open)conn.send({type:'field',h:H});
+  }
+  V={ball:freshBall(0),scores:{host:0,joiner:0},
+     pts:[],lbls:[],paused:false,pauseTimer:0,last:0,nextServe:'host'};
   show('game');
   acquireWake();
   countdown(()=>{
@@ -912,6 +937,12 @@ function pill(cx,cy,w,h,fill){
 function vSend(msg){try{if(vConn&&vConn.open)vConn.send(msg);}catch(e){}}
 
 function vRecv(msg){
+  if(msg.type==='field'){
+    // adopt the host's court size so both simulate the same field
+    setField(msg.h);
+    if(V){V.ball.x=W/2;V.ball.y=NET_Y;}
+    return;
+  }
   if(msg.type==='rematch'){
     if(rematchLock)return;     // we already initiated this rematch
     rematchLock=true;
