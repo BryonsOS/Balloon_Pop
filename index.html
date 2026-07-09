@@ -329,8 +329,8 @@
 // See README.md for the one-time database setup (table + policies).
 // Leave blank to hide all leaderboard features.
 // ════════════════════════════════════════════════════════════════════════
-const SUPABASE_URL      = '';   // e.g. 'https://abcdefgh.supabase.co'
-const SUPABASE_ANON_KEY = '';   // your project's anon/public key
+const SUPABASE_URL      = 'https://mhktyejanikvdnjbndgi.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_ghD1UY99uWhrEyGqIzoRXA_wn3-_9kh';
 
 // ── Constants ─────────────────────────────────────────────────────────────
 const W=480, H=640, GROUND_Y=H-30, NET_Y=H/2;
@@ -639,7 +639,7 @@ const sbHeaders=()=>({
 let lastAlias='';   // remembered for the session
 
 async function sbSave(alias,score){
-  const res=await fetch(SUPABASE_URL+'/rest/v1/scores',{
+  const res=await fetch(SUPABASE_URL+'/rest/v1/balloon_scores',{
     method:'POST',
     headers:{...sbHeaders(),'Prefer':'return=minimal'},
     body:JSON.stringify({alias,score})
@@ -649,7 +649,7 @@ async function sbSave(alias,score){
 
 async function sbTop(limit){
   const res=await fetch(
-    SUPABASE_URL+'/rest/v1/scores?select=alias,score&order=score.desc&limit='+(limit||20),
+    SUPABASE_URL+'/rest/v1/balloon_scores?select=alias,score&order=score.desc&limit='+(limit||20),
     {headers:sbHeaders()});
   if(!res.ok) throw new Error('load failed ('+res.status+')');
   return res.json();

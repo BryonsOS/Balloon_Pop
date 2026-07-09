@@ -15,55 +15,35 @@ leaderboard.
   One player hosts and shares a 6-character room code; the other joins
   from their own device. Connection is peer-to-peer (PeerJS) — no server.
 
-## Leaderboard setup (optional, one-time)
+## Leaderboard
 
-The leaderboard stores aliases + scores in a free [Supabase](https://supabase.com)
-project. Until configured, the leaderboard button shows a "not set up" notice
-and everything else works normally.
+The leaderboard is **already set up and live**. Scores are stored in the
+`balloon_scores` table of the Supabase project, and the project URL +
+publishable key are configured at the top of the `<script>` block in
+`index.html`. The publishable key is safe to ship — row-level security
+policies only allow reading scores and inserting new ones.
 
-### 1. Create a Supabase project
+After a solo game ends, players can enter a name (max 12 chars) and save
+their score; the 🏆 Leaderboard screen shows the global top 20.
 
-Sign up at [supabase.com](https://supabase.com) (free tier is plenty) and
-create a new project.
-
-### 2. Create the scores table
-
-In your project's **SQL Editor**, run:
+The table was created with this migration (for reference):
 
 ```sql
-create table public.scores (
+create table public.balloon_scores (
   id uuid primary key default gen_random_uuid(),
   alias text not null check (char_length(alias) between 1 and 12),
   score int not null check (score >= 0 and score < 1000000),
   created_at timestamptz not null default now()
 );
 
-alter table public.scores enable row level security;
+alter table public.balloon_scores enable row level security;
 
--- anyone can read the leaderboard
-create policy "public read" on public.scores
+create policy "public read" on public.balloon_scores
   for select using (true);
 
--- anyone can submit a score (anonymous inserts)
-create policy "public insert" on public.scores
+create policy "public insert" on public.balloon_scores
   for insert with check (true);
 ```
-
-### 3. Paste your keys into the game
-
-In `index.html`, near the top of the `<script>` block:
-
-```js
-const SUPABASE_URL      = 'https://YOUR-PROJECT-REF.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
-```
-
-Both values are in your Supabase dashboard under
-**Project Settings → API**. The anon key is safe to publish — it only allows
-what the policies above permit (read scores, insert scores).
-
-That's it. After a solo game ends, players can enter a name (max 12 chars)
-and save their score; the 🏆 Leaderboard screen shows the global top 20.
 
 > **Note on cheating:** since scores are submitted from the browser, a
 > determined person could post a fake score with curl. For a casual
